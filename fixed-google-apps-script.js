@@ -63,6 +63,22 @@ function doGet(e) {
     var headers = values[0];
     var rows = values.slice(1);
 
+    // Check if raw data is requested
+    if (e.parameter && e.parameter.rawdata === '1') {
+      // Return raw poll response data
+      var rawData = rows.map(function(row) {
+        var obj = {};
+        headers.forEach(function(header, index) {
+          obj[header] = row[index] || '';
+        });
+        return obj;
+      });
+      
+      return ContentService.createTextOutput(JSON.stringify(rawData))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Return summary statistics (original behavior)
     var idx = {};
     ['Timestamp','Poll ID','Session ID','User Country','User State','User City','Latitude','Longitude']
       .forEach(function(h){ idx[h] = headers.indexOf(h); });

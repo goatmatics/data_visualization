@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamro Awaz - Interactive Data Visualization</title>
+    
+    <!-- Chart.js for beautiful charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    
+    <!-- Leaflet for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #00ff88;
+            --secondary-color: #0088ff;
+            --accent-color: #ff0088;
+            --background-dark: #0a0a0a;
+            --surface-dark: #1a1a1a;
+            --surface-light: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #666666;
+            --border-color: #333333;
+            --gradient-primary: linear-gradient(135deg, #00ff88, #0088ff);
+            --gradient-secondary: linear-gradient(135deg, #0088ff, #ff0088);
+            --gradient-accent: linear-gradient(135deg, #ff0088, #00ff88);
+            --shadow-glow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--surface-dark);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .filters-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-select {
+            background: var(--surface-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--background-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--surface-dark);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-type-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-type-btn {
+            padding: 0.5rem 1rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .chart-type-btn.active {
+            background: var(--primary-color);
+            color: var(--background-dark);
+            border-color: var(--primary-color);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Map Section */
+        .map-section {
+            background: var(--surface-dark);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .map-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        #voter-map {
+            height: 500px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-stats {
+                display: none;
+            }
+            
+            .page-title h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Custom Chart Colors */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Poll Question Display */
+        .poll-question {
+            background: var(--surface-light);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .poll-question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .poll-category {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Hamro Awaz</div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-responses">0</div>
+                        <div class="stat-label">Total Responses</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-countries">0</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-polls">18</div>
+                        <div class="stat-label">Active Polls</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Title -->
+            <div class="page-title">
+                <h1>Interactive Data Visualization</h1>
+                <p>Explore poll responses with dynamic filtering and beautiful visualizations. Filter by demographics, geography, and more to uncover insights from the Hamro Awaz polling data.</p>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <h2 class="filters-title">
+                    <i class="fas fa-filter"></i> Filter Data
+                </h2>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Country</label>
+                        <select class="filter-select" id="country-filter">
+                            <option value="">All Countries</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Age Group</label>
+                        <select class="filter-select" id="age-filter">
+                            <option value="">All Age Groups</option>
+                            <option value="below 18">Below 18</option>
+                            <option value="18-24">18-24</option>
+                            <option value="25-34">25-34</option>
+                            <option value="35-49">35-49</option>
+                            <option value="50+">50+</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Residence</label>
+                        <select class="filter-select" id="residence-filter">
+                            <option value="">All Locations</option>
+                            <option value="Nepal – Urban">Nepal – Urban</option>
+                            <option value="Nepal – Rural">Nepal – Rural</option>
+                            <option value="Diaspora – India and China">Diaspora – India and China</option>
+                            <option value="Diaspora – Gulf/Middle East">Diaspora – Gulf/Middle East</option>
+                            <option value="Diaspora – West">Diaspora – West</option>
+                            <option value="Diaspora - Other">Diaspora - Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Political Affiliation</label>
+                        <select class="filter-select" id="affiliation-filter">
+                            <option value="">All Affiliations</option>
+                            <option value="Nepali Congress">Nepali Congress</option>
+                            <option value="UML">UML</option>
+                            <option value="Maoist">Maoist</option>
+                            <option value="Other political party">Other political party</option>
+                            <option value="Independent/No party">Independent/No party</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Poll Category</label>
+                        <select class="filter-select" id="category-filter">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Time Period</label>
+                        <select class="filter-select" id="time-filter">
+                            <option value="">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-search"></i> Apply Filters
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> Clear All
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <!-- Response Distribution Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Response Distribution</h3>
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('responseChart', 'doughnut')">Doughnut</button>
+                            <button class="chart-type-btn" onclick="changeChartType('responseChart', 'bar')">Bar</button>
+                            <button class="chart-type-btn" onclick="changeChartType('responseChart', 'pie')">Pie</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="responseChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Geographic Distribution Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Geographic Distribution</h3>
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('geoChart', 'bar')">Bar</button>
+                            <button class="chart-type-btn" onclick="changeChartType('geoChart', 'horizontalBar')">Horizontal</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Age Group Analysis -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Age Group Analysis</h3>
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('ageChart', 'bar')">Bar</button>
+                            <button class="chart-type-btn" onclick="changeChartType('ageChart', 'line')">Line</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Political Affiliation Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Political Affiliation</h3>
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('affiliationChart', 'doughnut')">Doughnut</button>
+                            <button class="chart-type-btn" onclick="changeChartType('affiliationChart', 'pie')">Pie</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="affiliationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Map -->
+            <div class="map-section">
+                <h2 class="map-title">
+                    <i class="fas fa-globe"></i> Global Voter Distribution
+                </h2>
+                <div id="voter-map"></div>
+            </div>
+
+            <!-- Poll Questions Section -->
+            <div class="charts-section">
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Poll Question Analysis</h3>
+                        <select class="filter-select" id="poll-selector" style="width: 300px;">
+                            <option value="">Select a poll question...</option>
+                        </select>
+                    </div>
+                    <div id="poll-question-display"></div>
+                    <div class="chart-wrapper">
+                        <canvas id="pollChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="data-visualization.js"></script>
+</body>
+</html>
