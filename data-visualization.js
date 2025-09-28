@@ -482,11 +482,7 @@ function initializeCharts() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true
-                    }
+                    display: false
                 },
                 tooltip: {
                     enabled: false
@@ -513,6 +509,9 @@ function initializeCharts() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    enabled: false
                 }
             },
             layout: {
@@ -598,6 +597,9 @@ function initializeCharts() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    enabled: false
                 }
             },
             layout: {
@@ -682,11 +684,7 @@ function initializeCharts() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true
-                    }
+                    display: false
                 },
                 tooltip: {
                     enabled: false
@@ -713,6 +711,9 @@ function initializeCharts() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    enabled: false
                 }
             },
             layout: {
