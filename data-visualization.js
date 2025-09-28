@@ -518,7 +518,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 40,
+                    bottom: 30,
                     left: 10,
                     right: 10
                 }
@@ -566,19 +566,12 @@ function initializeCharts() {
                         maxRotation: 0,
                         minRotation: 0,
                         font: {
-                            size: 8,
-                            family: 'monospace'
+                            size: 9
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return createJustifiedTextBox(label, 25); // Create justified text box at 25 characters
+                            return createSimpleWrappedText(label, 18); // Simple wrapped text at 18 characters
                         }
-                    },
-                    afterBuildTicks: function(axis) {
-                        // Add text justification to x-axis labels
-                        axis.ticks.forEach(function(tick) {
-                            tick.label = createJustifiedTextBox(tick.label, 25);
-                        });
                     },
                     grid: {
                         color: '#333333'
@@ -611,7 +604,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 40,
+                    bottom: 30,
                     left: 10,
                     right: 10
                 }
@@ -659,19 +652,12 @@ function initializeCharts() {
                         maxRotation: 0,
                         minRotation: 0,
                         font: {
-                            size: 8,
-                            family: 'monospace'
+                            size: 9
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return createJustifiedTextBox(label, 25); // Create justified text box at 25 characters
+                            return createSimpleWrappedText(label, 18); // Simple wrapped text at 18 characters
                         }
-                    },
-                    afterBuildTicks: function(axis) {
-                        // Add text justification to x-axis labels
-                        axis.ticks.forEach(function(tick) {
-                            tick.label = createJustifiedTextBox(tick.label, 25);
-                        });
                     },
                     grid: {
                         color: '#333333'
@@ -734,7 +720,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 40,
+                    bottom: 30,
                     left: 10,
                     right: 10
                 }
@@ -1119,27 +1105,19 @@ function updatePollChart(pollId) {
         }
     };
     
-    // Update x-axis formatting for poll chart with justified text boxes
+    // Update x-axis formatting for poll chart with simple wrapped text
     charts.pollChart.options.scales.x.ticks = {
         color: '#b0b0b0',
         maxRotation: 0,
         minRotation: 0,
         font: {
-            size: 8,
-            family: 'monospace'
+            size: 9
         },
-        maxTicksLimit: 10,
+        maxTicksLimit: 8,
         callback: function(value, index, ticks) {
             const label = this.getLabelForValue(value);
-            return createJustifiedTextBox(label, 30); // Create justified text box at 30 characters
+            return createSimpleWrappedText(label, 20); // Simple wrapped text at 20 characters
         }
-    };
-    
-    // Add afterBuildTicks for poll chart to ensure justified text boxes
-    charts.pollChart.options.scales.x.afterBuildTicks = function(axis) {
-        axis.ticks.forEach(function(tick) {
-            tick.label = createJustifiedTextBox(tick.label, 30);
-        });
     };
     
     // Disable tooltips for cleaner look
@@ -1203,40 +1181,26 @@ function justifyText(text, maxLength) {
     return justifiedLines.join('\n');
 }
 
-// Helper function to create justified text boxes for x-axis labels
-function createJustifiedTextBox(text, maxLength) {
+// Helper function to create simple wrapped text for x-axis labels
+function createSimpleWrappedText(text, maxLength) {
     if (!text) return '';
     
-    // First wrap the text
-    const wrappedText = wrapText(text, maxLength);
-    const lines = wrappedText.split('\n');
+    // Simple word wrapping without justification
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
     
-    // Justify each line
-    const justifiedLines = lines.map(line => {
-        if (line.length <= maxLength) {
-            // Center short lines
-            const padding = Math.floor((maxLength - line.length) / 2);
-            return ' '.repeat(padding) + line + ' '.repeat(maxLength - line.length - padding);
+    for (const word of words) {
+        if ((currentLine + ' ' + word).length <= maxLength) {
+            currentLine += (currentLine ? ' ' : '') + word;
+        } else {
+            if (currentLine) lines.push(currentLine);
+            currentLine = word;
         }
-        
-        const words = line.split(' ');
-        if (words.length <= 1) return line.padEnd(maxLength);
-        
-        const totalSpaces = maxLength - line.replace(/\s/g, '').length;
-        const gaps = words.length - 1;
-        const baseSpaces = Math.floor(totalSpaces / gaps);
-        const extraSpaces = totalSpaces % gaps;
-        
-        let justifiedLine = words[0];
-        for (let i = 1; i < words.length; i++) {
-            const spaces = baseSpaces + (i <= extraSpaces ? 1 : 0);
-            justifiedLine += ' '.repeat(spaces) + words[i];
-        }
-        
-        return justifiedLine;
-    });
+    }
     
-    return justifiedLines.join('\n');
+    if (currentLine) lines.push(currentLine);
+    return lines.join('\n');
 }
 
 // Map abbreviated responses to full questionnaire options
