@@ -513,10 +513,24 @@ function initializeCharts() {
                     display: false
                 }
             },
+            layout: {
+                padding: {
+                    bottom: 20
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     max: 100,
+                    title: {
+                        display: true,
+                        text: 'Percentage (%)',
+                        color: '#b0b0b0',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
                     ticks: {
                         color: '#b0b0b0',
                         callback: function(value) {
@@ -528,8 +542,26 @@ function initializeCharts() {
                     }
                 },
                 x: {
+                    title: {
+                        display: true,
+                        text: 'Responses',
+                        color: '#b0b0b0',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
                     ticks: {
-                        color: '#b0b0b0'
+                        color: '#b0b0b0',
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: {
+                            size: 10
+                        },
+                        callback: function(value, index, ticks) {
+                            const label = this.getLabelForValue(value);
+                            return wrapText(label, 20); // Wrap text at 20 characters
+                        }
                     },
                     grid: {
                         color: '#333333'
@@ -560,10 +592,24 @@ function initializeCharts() {
                     display: false
                 }
             },
+            layout: {
+                padding: {
+                    bottom: 20
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     max: 100,
+                    title: {
+                        display: true,
+                        text: 'Percentage (%)',
+                        color: '#b0b0b0',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
                     ticks: {
                         color: '#b0b0b0',
                         callback: function(value) {
@@ -575,8 +621,26 @@ function initializeCharts() {
                     }
                 },
                 x: {
+                    title: {
+                        display: true,
+                        text: 'Responses',
+                        color: '#b0b0b0',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
                     ticks: {
-                        color: '#b0b0b0'
+                        color: '#b0b0b0',
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: {
+                            size: 10
+                        },
+                        callback: function(value, index, ticks) {
+                            const label = this.getLabelForValue(value);
+                            return wrapText(label, 20); // Wrap text at 20 characters
+                        }
                     },
                     grid: {
                         color: '#333333'
@@ -632,6 +696,11 @@ function initializeCharts() {
             plugins: {
                 legend: {
                     display: false
+                }
+            },
+            layout: {
+                padding: {
+                    bottom: 20
                 }
             },
             scales: {
@@ -996,7 +1065,7 @@ function updatePollChart(pollId) {
     charts.pollChart.data.datasets[0].data = data;
     charts.pollChart.data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
     
-    // Update chart options to show percentage
+    // Update chart options to show percentage and better formatting
     charts.pollChart.options.plugins.tooltip = {
         callbacks: {
             label: function(context) {
@@ -1009,7 +1078,46 @@ function updatePollChart(pollId) {
         }
     };
     
+    // Update x-axis formatting for poll chart
+    charts.pollChart.options.scales.x.ticks = {
+        color: '#b0b0b0',
+        maxRotation: 0,
+        minRotation: 0,
+        font: {
+            size: 9
+        },
+        callback: function(value, index, ticks) {
+            const label = this.getLabelForValue(value);
+            return wrapText(label, 25); // Wrap text at 25 characters for poll chart
+        }
+    };
+    
+    // Increase chart height for better text display
+    charts.pollChart.options.maintainAspectRatio = false;
+    charts.pollChart.canvas.parentNode.style.height = '500px';
+    
     charts.pollChart.update();
+}
+
+// Helper function to wrap text for better display
+function wrapText(text, maxLength) {
+    if (!text || text.length <= maxLength) return text;
+    
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+        if ((currentLine + word).length <= maxLength) {
+            currentLine += (currentLine ? ' ' : '') + word;
+        } else {
+            if (currentLine) lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    
+    if (currentLine) lines.push(currentLine);
+    return lines.join('\n');
 }
 
 // Map abbreviated responses to full questionnaire options
