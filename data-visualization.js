@@ -553,8 +553,8 @@ function initializeCharts() {
                     },
                     ticks: {
                         color: '#b0b0b0',
-                        maxRotation: 45,
-                        minRotation: 45,
+                        maxRotation: 0,
+                        minRotation: 0,
                         font: {
                             size: 10
                         },
@@ -562,6 +562,12 @@ function initializeCharts() {
                             const label = this.getLabelForValue(value);
                             return wrapText(label, 20); // Wrap text at 20 characters
                         }
+                    },
+                    afterBuildTicks: function(axis) {
+                        // Add text justification to x-axis labels
+                        axis.ticks.forEach(function(tick) {
+                            tick.label = justifyText(tick.label, 20);
+                        });
                     },
                     grid: {
                         color: '#333333'
@@ -632,8 +638,8 @@ function initializeCharts() {
                     },
                     ticks: {
                         color: '#b0b0b0',
-                        maxRotation: 45,
-                        minRotation: 45,
+                        maxRotation: 0,
+                        minRotation: 0,
                         font: {
                             size: 10
                         },
@@ -641,6 +647,12 @@ function initializeCharts() {
                             const label = this.getLabelForValue(value);
                             return wrapText(label, 20); // Wrap text at 20 characters
                         }
+                    },
+                    afterBuildTicks: function(axis) {
+                        // Add text justification to x-axis labels
+                        axis.ticks.forEach(function(tick) {
+                            tick.label = justifyText(tick.label, 20);
+                        });
                     },
                     grid: {
                         color: '#333333'
@@ -1078,7 +1090,7 @@ function updatePollChart(pollId) {
         }
     };
     
-    // Update x-axis formatting for poll chart
+    // Update x-axis formatting for poll chart with justified text
     charts.pollChart.options.scales.x.ticks = {
         color: '#b0b0b0',
         maxRotation: 0,
@@ -1088,8 +1100,15 @@ function updatePollChart(pollId) {
         },
         callback: function(value, index, ticks) {
             const label = this.getLabelForValue(value);
-            return wrapText(label, 25); // Wrap text at 25 characters for poll chart
+            return justifyText(wrapText(label, 25), 25); // Wrap and justify text at 25 characters
         }
+    };
+    
+    // Add afterBuildTicks for poll chart to ensure justified text
+    charts.pollChart.options.scales.x.afterBuildTicks = function(axis) {
+        axis.ticks.forEach(function(tick) {
+            tick.label = justifyText(tick.label, 25);
+        });
     };
     
     // Increase chart height for better text display
@@ -1118,6 +1137,34 @@ function wrapText(text, maxLength) {
     
     if (currentLine) lines.push(currentLine);
     return lines.join('\n');
+}
+
+// Helper function to justify text with proper spacing
+function justifyText(text, maxLength) {
+    if (!text || text.length <= maxLength) return text;
+    
+    const lines = text.split('\n');
+    const justifiedLines = lines.map(line => {
+        if (line.length <= maxLength) return line;
+        
+        const words = line.split(' ');
+        if (words.length <= 1) return line;
+        
+        const totalSpaces = maxLength - line.replace(/\s/g, '').length;
+        const gaps = words.length - 1;
+        const baseSpaces = Math.floor(totalSpaces / gaps);
+        const extraSpaces = totalSpaces % gaps;
+        
+        let justifiedLine = words[0];
+        for (let i = 1; i < words.length; i++) {
+            const spaces = baseSpaces + (i <= extraSpaces ? 1 : 0);
+            justifiedLine += ' '.repeat(spaces) + words[i];
+        }
+        
+        return justifiedLine;
+    });
+    
+    return justifiedLines.join('\n');
 }
 
 // Map abbreviated responses to full questionnaire options
