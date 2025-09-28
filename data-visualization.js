@@ -262,8 +262,8 @@ async function loadDataFromGoogleSheets() {
     try {
         console.log('Loading data from Google Sheets...');
         
-        // Use the same webhook URL from config.js but with a different parameter to get data
-        const webhookUrl = 'https://script.google.com/macros/s/AKfycbwUepofr_IK7e_yKL_nSZNYCNhPI-stlhuczVHI7b05QJ6as99bhESOLM29KB95VK87Yg/exec';
+        // Use the webhook URL from config.js
+        const webhookUrl = window.WEBHOOK_CONFIG.webhookUrl;
         const dataUrl = webhookUrl + '?rawdata=1';
         
         const response = await fetch(dataUrl, {

@@ -1,78 +1,153 @@
-# DataDriven Nepal - Backend Development Repository
+# 📊 Hamro Awaz - Data Visualization Repository
 
-This is the private development repository for the DataDriven Nepal polling platform.
+This repository contains the interactive data visualization components for the Hamro Awaz polling platform. It provides beautiful, real-time visualizations of poll data collected from Google Sheets.
 
-## 🔒 Security
-- **Private Repository**: This repository is private and contains all development files
-- **No Public Access**: Only authorized developers can access this repository
-- **Source Code Protection**: All source code, configuration, and development tools are kept secure
+## 🎯 Overview
+
+This visualization platform connects directly to your Google Spreadsheet and displays:
+- **Interactive Charts**: Response distribution, geographic analysis, demographic breakdowns
+- **Real-time Maps**: Global voter distribution with country-based markers
+- **Advanced Filtering**: Filter by demographics, geography, time periods, and more
+- **Data Export**: Download filtered data for further analysis
 
 ## 📁 Repository Structure
 
-### Core Development Files
-- `polls-config.md` - Poll configuration in markdown format
-- `update-polls.py` - Script to convert markdown to HTML
-- `js/hamroawaz.js` - Main JavaScript application
-- `css/hamroawaz.css` - Stylesheet
-- `config.js` - Application configuration
-- `translations.js` - Multi-language support
+### Core Visualization Files
+- `data-visualization.html` - Main visualization dashboard
+- `data-visualization.js` - Interactive functionality and chart logic
+- `data-processor.py` - Python script for data analysis and processing
+- `config.js` - Configuration for Google Sheets connection
 
-### Admin Tools
-- `poll-admin-interface.html` - Administrative interface
-- `poll-lifecycle-manager.js` - Poll management system
-- `webhook-collector.js` - Data collection system
+### Setup & Testing
+- `setup-visualization.sh` - Automated setup script
+- `test-visualization.py` - Test script to verify functionality
 
 ### Documentation
-- `POLL-MANAGEMENT.md` - Poll management guide
-- `GOOGLE_SHEETS_SETUP_GUIDE.md` - Google Sheets integration guide
-- `fixed-google-apps-script.js` - Google Apps Script code
+- `DATA-VISUALIZATION-README.md` - Comprehensive documentation
+- `README.md` - This file
 
 ### Assets
-- `assets/` - Images, icons, and other static files
+- `assets/images/logo.png` - Logo and visual assets
 
-## 🚀 Development Workflow
+## 🚀 Quick Start
 
-1. **Edit Polls**: Modify `polls-config.md` to update poll questions and options
-2. **Generate HTML**: Run `python3 update-polls.py` to convert markdown to HTML
-3. **Deploy**: Copy generated files to the public deployment repository
-4. **Test**: Verify changes work correctly on the live website
-
-## 🔧 Setup
-
+### 1. Setup
 ```bash
 # Clone the repository
-git clone https://github.com/goatmatics/backend.git
-cd backend
+git clone <your-repo-url>
+cd data_visualization
 
-# Install dependencies (if any)
-# No external dependencies required
-
-# Generate HTML from markdown
-python3 update-polls.py
-
-# Deploy to public repository
-./deploy.sh  # (deployment script to be created)
+# Run the setup script
+chmod +x setup-visualization.sh
+./setup-visualization.sh
 ```
 
-## 📊 Poll Management
+### 2. Configure Google Sheets Connection
+1. Update `config.js` with your Google Apps Script webhook URL
+2. Ensure your Google Apps Script is deployed as a web app
+3. Set permissions to "Anyone" for public access
 
-The polling system uses a markdown-based configuration system:
+### 3. Launch Visualization
+```bash
+# Open the visualization in your browser
+open data-visualization.html
+```
 
-- Edit `polls-config.md` to modify polls
-- Run `python3 update-polls.py` to generate HTML
-- Copy files to public repository for deployment
+## 📊 Features
 
-## 🛡️ Security Features
+### Interactive Charts
+- **Response Distribution**: Doughnut, pie, and bar charts
+- **Geographic Analysis**: Country-based response breakdowns
+- **Demographic Insights**: Age groups, residence, political affiliation
+- **Poll Question Analysis**: Individual poll deep-dives
 
-- Private repository with restricted access
-- No public forking allowed
-- Secure development environment
-- Protected source code and configuration
+### Advanced Filtering
+- Filter by country, age group, residence, political affiliation
+- Time-based filtering (today, this week, this month, all time)
+- Poll category filtering
+- Real-time chart updates
 
-## 📞 Contact
+### Data Export
+- Export filtered data as JSON
+- Use Python script for advanced analysis
+- Generate comprehensive reports
 
-For access or questions, contact: upendrabhattarai@g.harvard.edu
+## 🔧 Configuration
+
+### Google Sheets Integration
+The visualization connects to your Google Sheets via a webhook URL in `config.js`:
+
+```javascript
+window.WEBHOOK_CONFIG = {
+    webhookUrl: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+    options: {}
+};
+```
+
+### Data Format
+Your Google Apps Script should return data in this format:
+```json
+[
+  {
+    "Timestamp": "2024-01-01T00:00:00Z",
+    "Poll ID": "poll1",
+    "Response": "Option 1",
+    "Question": "Your question here?",
+    "Category": "Category Name",
+    "Session ID": "unique-session-id",
+    "User Country": "Nepal",
+    "User State": "State",
+    "User City": "City"
+  }
+]
+```
+
+## 📈 Data Analysis
+
+### Python Script Usage
+```bash
+# Get data summary
+python3 data-processor.py --webhook-url "YOUR_WEBHOOK_URL" --summary
+
+# Export data to CSV
+python3 data-processor.py --webhook-url "YOUR_WEBHOOK_URL" --export-csv data.csv
+
+# Export analysis to JSON
+python3 data-processor.py --webhook-url "YOUR_WEBHOOK_URL" --export-analysis analysis.json
+```
+
+## 🛠️ Dependencies
+
+### External Libraries (Loaded via CDN)
+- **Chart.js** - Interactive charts and graphs
+- **Leaflet** - Interactive maps
+- **Font Awesome** - Icons
+- **Google Fonts (Inter)** - Typography
+
+### Python Dependencies
+- `pandas` - Data manipulation
+- `requests` - HTTP requests
+
+## 📖 Documentation
+
+For detailed documentation, see:
+- `DATA-VISUALIZATION-README.md` - Comprehensive guide
+- Inline comments in JavaScript and Python files
+
+## 🔒 Security
+
+- **No API Keys**: Uses Google Apps Script webhook (no exposed credentials)
+- **Public Access**: Visualization is publicly accessible
+- **Data Privacy**: No local data storage, direct connection to Google Sheets
+- **CORS Handling**: Proper cross-origin request handling
+
+## 📞 Support
+
+For questions or issues:
+- Check the browser console for error messages
+- Verify your Google Apps Script webhook is working
+- Run `python3 test-visualization.py` to test functionality
 
 ---
 
-**Note**: This repository contains the complete development environment. The public website is deployed from a separate public repository that contains only the necessary files for GitHub Pages hosting.
+**Note**: This repository focuses solely on data visualization. The polling platform and data collection components are maintained in a separate repository.

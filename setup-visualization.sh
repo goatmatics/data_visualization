@@ -5,6 +5,8 @@
 
 echo "🚀 Setting up Hamro Awaz Data Visualization..."
 echo "=============================================="
+echo "📁 Repository: data_visualization"
+echo ""
 
 # Check if Python 3 is installed
 if ! command -v python3 &> /dev/null; then

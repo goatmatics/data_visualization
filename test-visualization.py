@@ -10,6 +10,7 @@ def test_webhook_connection():
     """Test connection to Google Sheets webhook"""
     try:
         import requests
+        # Use the webhook URL from config.js (you may need to update this)
         webhook_url = "https://script.google.com/macros/s/AKfycbwUepofr_IK7e_yKL_nSZNYCNhPI-stlhuczVHI7b05QJ6as99bhESOLM29KB95VK87Yg/exec"
         
         print("🔗 Testing webhook connection...")
