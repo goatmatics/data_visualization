@@ -516,8 +516,12 @@ function initializeCharts() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: 100,
                     ticks: {
-                        color: '#b0b0b0'
+                        color: '#b0b0b0',
+                        callback: function(value) {
+                            return value + '%';
+                        }
                     },
                     grid: {
                         color: '#333333'
@@ -559,8 +563,12 @@ function initializeCharts() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: 100,
                     ticks: {
-                        color: '#b0b0b0'
+                        color: '#b0b0b0',
+                        callback: function(value) {
+                            return value + '%';
+                        }
                     },
                     grid: {
                         color: '#333333'
@@ -665,13 +673,43 @@ function updateResponseChart() {
         responseCounts[d.response] = (responseCounts[d.response] || 0) + 1;
     });
     
-    const labels = Object.keys(responseCounts);
-    const data = Object.values(responseCounts);
+    const total = Object.values(responseCounts).reduce((sum, count) => sum + count, 0);
+    const labels = Object.keys(responseCounts).map(response => {
+        // Try to find which poll this response belongs to and map it
+        const pollId = findPollIdForResponse(response);
+        return pollId ? mapResponseToFullOption(pollId, response) : response;
+    });
+    const data = Object.values(responseCounts).map(count => Math.round((count / total) * 100 * 10) / 10); // Convert to percentage with 1 decimal
     
     charts.responseChart.data.labels = labels;
     charts.responseChart.data.datasets[0].data = data;
     charts.responseChart.data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
+    
+    // Update chart options to show percentage
+    charts.responseChart.options.plugins.tooltip = {
+        callbacks: {
+            label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                const count = Math.round((value / 100) * total);
+                return `${label}: ${value}% (${count} responses)`;
+            }
+        }
+    };
+    
     charts.responseChart.update();
+}
+
+// Helper function to find which poll a response belongs to
+function findPollIdForResponse(response) {
+    for (const pollId of Object.keys(pollQuestions)) {
+        const pollData = filteredData.filter(d => d.pollId === pollId && d.response === response);
+        if (pollData.length > 0) {
+            return pollId;
+        }
+    }
+    return null;
 }
 
 // Update geographic distribution chart
@@ -681,15 +719,30 @@ function updateGeoChart() {
         countryCounts[d.userCountry] = (countryCounts[d.userCountry] || 0) + 1;
     });
     
+    const total = Object.values(countryCounts).reduce((sum, count) => sum + count, 0);
     const sortedCountries = Object.entries(countryCounts)
         .sort(([,a], [,b]) => b - a)
         .slice(0, 10); // Top 10 countries
     
     const labels = sortedCountries.map(([country]) => country);
-    const data = sortedCountries.map(([, count]) => count);
+    const data = sortedCountries.map(([, count]) => Math.round((count / total) * 100 * 10) / 10); // Convert to percentage
     
     charts.geoChart.data.labels = labels;
     charts.geoChart.data.datasets[0].data = data;
+    
+    // Update chart options to show percentage
+    charts.geoChart.options.plugins.tooltip = {
+        callbacks: {
+            label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                const count = Math.round((value / 100) * total);
+                return `${label}: ${value}% (${count} responses)`;
+            }
+        }
+    };
+    
     charts.geoChart.update();
 }
 
@@ -703,12 +756,27 @@ function updateAgeChart() {
         ageCounts[d.response] = (ageCounts[d.response] || 0) + 1;
     });
     
+    const total = Object.values(ageCounts).reduce((sum, count) => sum + count, 0);
     const ageOrder = ['below 18', '18-24', '25-34', '35-49', '50+'];
-    const labels = ageOrder.filter(age => ageCounts[age]);
-    const data = labels.map(age => ageCounts[age]);
+    const labels = ageOrder.filter(age => ageCounts[age]).map(age => mapResponseToFullOption('poll17', age));
+    const data = ageOrder.filter(age => ageCounts[age]).map(age => Math.round((ageCounts[age] / total) * 100 * 10) / 10); // Convert to percentage
     
     charts.ageChart.data.labels = labels;
     charts.ageChart.data.datasets[0].data = data;
+    
+    // Update chart options to show percentage
+    charts.ageChart.options.plugins.tooltip = {
+        callbacks: {
+            label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                const count = Math.round((value / 100) * total);
+                return `${label}: ${value}% (${count} responses)`;
+            }
+        }
+    };
+    
     charts.ageChart.update();
 }
 
@@ -722,12 +790,27 @@ function updateAffiliationChart() {
         affiliationCounts[d.response] = (affiliationCounts[d.response] || 0) + 1;
     });
     
-    const labels = Object.keys(affiliationCounts);
-    const data = Object.values(affiliationCounts);
+    const total = Object.values(affiliationCounts).reduce((sum, count) => sum + count, 0);
+    const labels = Object.keys(affiliationCounts).map(affiliation => mapResponseToFullOption('poll18', affiliation));
+    const data = Object.values(affiliationCounts).map(count => Math.round((count / total) * 100 * 10) / 10); // Convert to percentage
     
     charts.affiliationChart.data.labels = labels;
     charts.affiliationChart.data.datasets[0].data = data;
     charts.affiliationChart.data.datasets[0].backgroundColor = chartColors.slice(3, 3 + labels.length);
+    
+    // Update chart options to show percentage
+    charts.affiliationChart.options.plugins.tooltip = {
+        callbacks: {
+            label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                const count = Math.round((value / 100) * total);
+                return `${label}: ${value}% (${count} responses)`;
+            }
+        }
+    };
+    
     charts.affiliationChart.update();
 }
 
@@ -905,13 +988,123 @@ function updatePollChart(pollId) {
         responseCounts[d.response] = (responseCounts[d.response] || 0) + 1;
     });
     
-    const labels = Object.keys(responseCounts);
-    const data = Object.values(responseCounts);
+    const total = Object.values(responseCounts).reduce((sum, count) => sum + count, 0);
+    const labels = Object.keys(responseCounts).map(response => mapResponseToFullOption(pollId, response));
+    const data = Object.values(responseCounts).map(count => Math.round((count / total) * 100 * 10) / 10); // Convert to percentage
     
     charts.pollChart.data.labels = labels;
     charts.pollChart.data.datasets[0].data = data;
     charts.pollChart.data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
+    
+    // Update chart options to show percentage
+    charts.pollChart.options.plugins.tooltip = {
+        callbacks: {
+            label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                const count = Math.round((value / 100) * total);
+                return `${label}: ${value}% (${count} responses)`;
+            }
+        }
+    };
+    
     charts.pollChart.update();
+}
+
+// Map abbreviated responses to full questionnaire options
+function mapResponseToFullOption(pollId, response) {
+    const poll = pollQuestions[pollId];
+    if (!poll || !poll.options) return response;
+    
+    // Create a mapping from abbreviated responses to full options
+    const responseMap = {
+        'very_satisfied___': 'Very satisfied – The response was proportionate and necessary for order.',
+        'somewhat_satisfied__': 'Somewhat satisfied – It restored stability, but violence was excessive.',
+        'somewhat_dissatisfie': 'Somewhat dissatisfied – The crackdown was too harsh and ignored root causes like economic despair.',
+        'very_dissatisfied___': 'Very dissatisfied – It was a brutal suppression of legitimate demands, eroding democracy.',
+        'the_social_media_ba': 'The social media ban and restrictions on free speech/digital rights.',
+        'youth_unemployment__': 'Youth unemployment, economic inequality, and lack of opportunities.',
+        'corruption__nepotism': 'Corruption, nepotism, and elite capture of public resources.',
+        'a_combination_of_all': 'A combination of all the above, amplified by global influences like Bangladesh\'s uprising.',
+        '1___endless_cycles_o': '1 – Endless cycles of coalition collapses and street protests.',
+        '2___frequent_crises_': '2 – Frequent crises with short-lived governments.',
+        '3___moderately_stab': '3 – Moderately stable federally, but centralized power breeds unrest.',
+        '4___improving_throu': '4 – Improving through devolution, but implementation lags.',
+        '5___robust_instituti': '5 – Robust institutions ensuring continuity.',
+        'significantly___it_s': 'Significantly – It\'s a wake-up call for radical change.',
+        'moderately___inspiri': 'Moderately – Inspiring, but needs structured channels.',
+        'slightly___symbolic_': 'Slightly – Symbolic, but elites will dilute it.',
+        'not_at_all___protest': 'Not at all – Protests often lead to more of the same.',
+        'transparent_investig': 'Transparent investigations and prosecutions for protest-related deaths and police excesses.',
+        'emergency_economic_r': 'Emergency economic relief, including youth stipends and job guarantees.',
+        'lifting_digital_ban': 'Lifting digital bans and enacting a Digital Rights Act.',
+        'rebuilding_damaged_i': 'Rebuilding damaged infrastructure with community involvement.',
+        'constitutional_amend': 'Constitutional amendments for electoral reforms.',
+        'very_effective___jud': 'Very effective – Judicial neutrality can bridge divides and enforce accountability.',
+        'somewhat_effective__': 'Somewhat effective – A credible stopgap, but lacks political mandate for bold changes.',
+        'neutral___procedural': 'Neutral – Procedural fix; real power lies with parties behind the scenes.',
+        'somewhat_ineffective': 'Somewhat ineffective – Risks being a puppet for old guard influences.',
+        'very_ineffective___d': 'Very ineffective – Demands a fully apolitical, youth-inclusive panel.',
+        'yes__i_am_satisfied_': 'Yes, I am satisfied.',
+        'somewhat_satisfied__': 'Somewhat satisfied, but major improvements are needed.',
+        'no__i_am_dissatisfie': 'No, I am dissatisfied.',
+        'too_early_to_judge_': 'Too early to judge.',
+        'strongly_support___d': 'Strongly support – Direct mandate reduces coalition horse-trading.',
+        'somewhat_support___i': 'Somewhat support – If combined with proportional representation for Parliament.',
+        'neutral___could_work': 'Neutral – Could work, but risks populism without checks.',
+        'somewhat_oppose___p': 'Somewhat oppose – Parliamentary system better suits Nepal\'s diversity.',
+        'strongly_oppose___m': 'Strongly oppose – Maintains instability; focus on intra-party democracy first.',
+        'directly_elected_pre': 'Directly elected President.',
+        'ceremonial_president': 'Ceremonial President as head and directly elected Prime Minister.',
+        'king_as_ceremonial_h': 'King as ceremonial head and directly elected Prime Minister.',
+        'other_form_of_direct': 'Other form of directly elected executive head.',
+        'current_system_is_th': 'Current system is the best for Nepal, there should not be directly elected executive head.',
+        'two_round_runoff__if': 'Two-round runoff (if no candidate gets a majority (>50%), the top two candidates compete in a second vote).',
+        'first_past_the_post_': 'First-past-the-post for simplicity and decisiveness (The candidate with the most votes wins, even if its not a majority).',
+        'ranked_choice_voting': 'Ranked-choice voting to ensure broader consensus (voters rank candidates in order of preference).',
+        'none_of_the_above_': 'None of the above.',
+        'fully_independent_el': 'Fully independent election commission with civil society veto power.',
+        'digital_voting_acces': 'Digital voting access for 2+ million diaspora Nepalese.',
+        'caps_on_campaign_spe': 'Caps on campaign spending (e.g., 50 million NPR per candidate).',
+        '30__youth_quota_for_': '30% youth quota for parliamentary seats.',
+        'current_system_serve': 'Current system serves best, no changes needed.',
+        'yes___maximum_two_co': 'Yes – Maximum two consecutive 5-year terms.',
+        'yes___one_term_only_': 'Yes – One term only (5 years) for fresh blood.',
+        'no___voters_should_d': 'No – Voters should decide; limits could deter experienced leaders.',
+        'conditional___two_te': 'Conditional – Two terms, but with recall mechanisms via referendum.',
+        'retain_and_strengthe': 'Retain and strengthen – Empowers marginalized regions and reduces central corruption.',
+        'retain_but_reform___': 'Retain but reform – Merge underperforming provinces for efficiency.',
+        'partially_remove___k': 'Partially remove – Keep federal for fiscal powers, unitary for security/foreign affairs.',
+        'fully_remove___unita': 'Fully remove – Unitary government streamlines decisions and cuts bureaucracy.',
+        'mandatory_public_ass': 'Mandatory public asset disclosures and auditing.',
+        'strong_whistleblower': 'Strong whistleblower laws with rewards (e.g., 10% of recovered funds).',
+        'citizen_juries_to_re': 'Citizen juries to review high-profile cases publicly.',
+        'all_of_the_above': 'All of the above',
+        'lower_voting_candida': 'Lower voting/candidacy age to 16/18 with civic education mandates.',
+        'cap_the_upper_age_li': 'Cap the upper age limit for leadership positions to the official retirement age for the executive head.',
+        'national_youth_parli': 'National Youth Parliament with advisory veto on bills (create a youth-specific parliamentary body that debates policies).',
+        'digital_platforms_fo': 'Digital platforms for crowdsourcing youth policy inputs.',
+        'i_am_not_sure__but_n': 'I am not sure, but needs to be done.',
+        'nepal___urban__in_an': 'Nepal – Urban (in any metropolitan city).',
+        'nepal___rural__not_i': 'Nepal – Rural (not in metropolitan city)',
+        'diaspora___india_and': 'Diaspora – India and China (border states).',
+        'diaspora___gulf_midd': 'Diaspora – Gulf/Middle East.',
+        'diaspora___west__us_': 'Diaspora – West (US/Europe/Australia).',
+        'diaspora___other__ot': 'Diaspora - Other (Other parts of the world).',
+        'below_18_': 'Below 18',
+        '18_24_': '18-24',
+        '25_34_': '25-34',
+        '35_49_': '35-49',
+        '50___': '50+',
+        'nepali_congress_': 'Nepali Congress',
+        'uml_': 'UML',
+        'maoist_': 'Maoist',
+        'other_political_part': 'Other political party',
+        'independent_no_party': 'Independent/No party'
+    };
+    
+    return responseMap[response] || response;
 }
 
 // Auto-refresh data every 30 seconds
