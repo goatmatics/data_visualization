@@ -487,6 +487,9 @@ function initializeCharts() {
                         padding: 20,
                         usePointStyle: true
                     }
+                },
+                tooltip: {
+                    enabled: false
                 }
             }
         }
@@ -515,7 +518,14 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 20
+                    bottom: 40,
+                    left: 10,
+                    right: 10
+                }
+            },
+            plugins: {
+                tooltip: {
+                    enabled: false
                 }
             },
             scales: {
@@ -556,17 +566,18 @@ function initializeCharts() {
                         maxRotation: 0,
                         minRotation: 0,
                         font: {
-                            size: 10
+                            size: 8,
+                            family: 'monospace'
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return wrapText(label, 20); // Wrap text at 20 characters
+                            return createJustifiedTextBox(label, 25); // Create justified text box at 25 characters
                         }
                     },
                     afterBuildTicks: function(axis) {
                         // Add text justification to x-axis labels
                         axis.ticks.forEach(function(tick) {
-                            tick.label = justifyText(tick.label, 20);
+                            tick.label = createJustifiedTextBox(tick.label, 25);
                         });
                     },
                     grid: {
@@ -600,7 +611,14 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 20
+                    bottom: 40,
+                    left: 10,
+                    right: 10
+                }
+            },
+            plugins: {
+                tooltip: {
+                    enabled: false
                 }
             },
             scales: {
@@ -641,17 +659,18 @@ function initializeCharts() {
                         maxRotation: 0,
                         minRotation: 0,
                         font: {
-                            size: 10
+                            size: 8,
+                            family: 'monospace'
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return wrapText(label, 20); // Wrap text at 20 characters
+                            return createJustifiedTextBox(label, 25); // Create justified text box at 25 characters
                         }
                     },
                     afterBuildTicks: function(axis) {
                         // Add text justification to x-axis labels
                         axis.ticks.forEach(function(tick) {
-                            tick.label = justifyText(tick.label, 20);
+                            tick.label = createJustifiedTextBox(tick.label, 25);
                         });
                     },
                     grid: {
@@ -684,6 +703,9 @@ function initializeCharts() {
                         padding: 20,
                         usePointStyle: true
                     }
+                },
+                tooltip: {
+                    enabled: false
                 }
             }
         }
@@ -712,7 +734,14 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 20
+                    bottom: 40,
+                    left: 10,
+                    right: 10
+                }
+            },
+            plugins: {
+                tooltip: {
+                    enabled: false
                 }
             },
             scales: {
@@ -1090,25 +1119,32 @@ function updatePollChart(pollId) {
         }
     };
     
-    // Update x-axis formatting for poll chart with justified text
+    // Update x-axis formatting for poll chart with justified text boxes
     charts.pollChart.options.scales.x.ticks = {
         color: '#b0b0b0',
         maxRotation: 0,
         minRotation: 0,
         font: {
-            size: 9
+            size: 8,
+            family: 'monospace'
         },
+        maxTicksLimit: 10,
         callback: function(value, index, ticks) {
             const label = this.getLabelForValue(value);
-            return justifyText(wrapText(label, 25), 25); // Wrap and justify text at 25 characters
+            return createJustifiedTextBox(label, 30); // Create justified text box at 30 characters
         }
     };
     
-    // Add afterBuildTicks for poll chart to ensure justified text
+    // Add afterBuildTicks for poll chart to ensure justified text boxes
     charts.pollChart.options.scales.x.afterBuildTicks = function(axis) {
         axis.ticks.forEach(function(tick) {
-            tick.label = justifyText(tick.label, 25);
+            tick.label = createJustifiedTextBox(tick.label, 30);
         });
+    };
+    
+    // Disable tooltips for cleaner look
+    charts.pollChart.options.plugins.tooltip = {
+        enabled: false
     };
     
     // Increase chart height for better text display
@@ -1149,6 +1185,42 @@ function justifyText(text, maxLength) {
         
         const words = line.split(' ');
         if (words.length <= 1) return line;
+        
+        const totalSpaces = maxLength - line.replace(/\s/g, '').length;
+        const gaps = words.length - 1;
+        const baseSpaces = Math.floor(totalSpaces / gaps);
+        const extraSpaces = totalSpaces % gaps;
+        
+        let justifiedLine = words[0];
+        for (let i = 1; i < words.length; i++) {
+            const spaces = baseSpaces + (i <= extraSpaces ? 1 : 0);
+            justifiedLine += ' '.repeat(spaces) + words[i];
+        }
+        
+        return justifiedLine;
+    });
+    
+    return justifiedLines.join('\n');
+}
+
+// Helper function to create justified text boxes for x-axis labels
+function createJustifiedTextBox(text, maxLength) {
+    if (!text) return '';
+    
+    // First wrap the text
+    const wrappedText = wrapText(text, maxLength);
+    const lines = wrappedText.split('\n');
+    
+    // Justify each line
+    const justifiedLines = lines.map(line => {
+        if (line.length <= maxLength) {
+            // Center short lines
+            const padding = Math.floor((maxLength - line.length) / 2);
+            return ' '.repeat(padding) + line + ' '.repeat(maxLength - line.length - padding);
+        }
+        
+        const words = line.split(' ');
+        if (words.length <= 1) return line.padEnd(maxLength);
         
         const totalSpaces = maxLength - line.replace(/\s/g, '').length;
         const gaps = words.length - 1;
