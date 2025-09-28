@@ -501,7 +501,6 @@ function initializeCharts() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Responses',
                 data: [],
                 backgroundColor: chartColors[1],
                 borderColor: chartColors[1],
@@ -518,7 +517,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 30,
+                    bottom: 50,
                     left: 10,
                     right: 10
                 }
@@ -587,7 +586,6 @@ function initializeCharts() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Responses',
                 data: [],
                 backgroundColor: chartColors[2],
                 borderColor: chartColors[2],
@@ -604,7 +602,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 30,
+                    bottom: 50,
                     left: 10,
                     right: 10
                 }
@@ -703,7 +701,6 @@ function initializeCharts() {
         data: {
             labels: [],
             datasets: [{
-                label: 'Responses',
                 data: [],
                 backgroundColor: chartColors[0],
                 borderColor: chartColors[0],
@@ -720,7 +717,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 30,
+                    bottom: 50,
                     left: 10,
                     right: 10
                 }
@@ -1111,12 +1108,11 @@ function updatePollChart(pollId) {
         maxRotation: 0,
         minRotation: 0,
         font: {
-            size: 9
+            size: 8
         },
-        maxTicksLimit: 8,
         callback: function(value, index, ticks) {
             const label = this.getLabelForValue(value);
-            return createSimpleWrappedText(label, 20); // Simple wrapped text at 20 characters
+            return createSimpleWrappedText(label, 15); // Simple wrapped text at 15 characters
         }
     };
     
