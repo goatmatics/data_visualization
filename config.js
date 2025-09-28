@@ -4,7 +4,7 @@
 // Google Apps Script Webhook Configuration
 // This connects the visualization to your Google Sheets data source
 window.WEBHOOK_CONFIG = {
-    webhookUrl: 'https://script.google.com/macros/s/AKfycbwUepofr_IK7e_yKL_nSZNYCNhPI-stlhuczVHI7b05QJ6as99bhESOLM29KB95VK87Yg/exec',
+    webhookUrl: 'https://script.google.com/macros/s/AKfycbwsp1ld82Uf085DOP_ftZChFJByGGzqb4AUn_0X_wlyOTWV9crZ4ppSmhB-827JofBB1A/exec', // Replace with your new webhook URL
     options: {}
 };
 
