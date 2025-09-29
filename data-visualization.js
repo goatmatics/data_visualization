@@ -724,25 +724,39 @@ function initializeCharts() {
                     right: 10
                 }
             },
-            plugins: {
-                tooltip: {
-                    enabled: false
-                }
-            },
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: false
+                    },
                     ticks: {
-                        color: '#b0b0b0'
+                        color: '#b0b0b0',
+                        callback: function(value) {
+                            return value + '%';
+                        }
                     },
                     grid: {
                         color: '#333333'
                     }
                 },
                 x: {
+                    title: {
+                        display: false
+                    },
                     ticks: {
                         color: '#b0b0b0',
-                        maxRotation: 45
+                        maxRotation: 0,
+                        minRotation: 0,
+                        font: {
+                            size: 11
+                        },
+                        maxTicksLimit: 10,
+                        callback: function(value, index, ticks) {
+                            const label = this.getLabelForValue(value);
+                            return createSimpleWrappedText(label, 30);
+                        }
                     },
                     grid: {
                         color: '#333333'
@@ -1091,41 +1105,9 @@ function updatePollChart(pollId) {
     charts.pollChart.data.datasets[0].data = data;
     charts.pollChart.data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
     
-    // Update chart options to show percentage and better formatting
-    charts.pollChart.options.plugins.tooltip = {
-        callbacks: {
-            label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-                const count = Math.round((value / 100) * total);
-                return `${label}: ${value}% (${count} responses)`;
-            }
-        }
-    };
+    // Tooltip is already disabled in chart initialization
     
-    // Update x-axis formatting for poll chart with centered wrapped text
-    charts.pollChart.options.scales.x.ticks = {
-        color: '#b0b0b0',
-        maxRotation: 0,
-        minRotation: 0,
-        font: {
-            size: 11
-        },
-        maxTicksLimit: 10,
-        callback: function(value, index, ticks) {
-            const label = this.getLabelForValue(value);
-            return createSimpleWrappedText(label, 30); // Centered wrapped text at 30 characters
-        }
-    };
-    
-    // Ensure all ticks are shown
-    charts.pollChart.options.scales.x.afterBuildTicks = function(axis) {
-        // Force all ticks to be shown
-        axis.ticks.forEach(function(tick) {
-            tick.label = createSimpleWrappedText(tick.label, 30);
-        });
-    };
+    // X-axis formatting is already configured in chart initialization
     
     // Disable tooltips for cleaner look
     charts.pollChart.options.plugins.tooltip = {
