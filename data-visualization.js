@@ -516,7 +516,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 50,
+                    bottom: 80,
                     left: 10,
                     right: 10
                 }
@@ -564,11 +564,11 @@ function initializeCharts() {
                         maxRotation: 0,
                         minRotation: 0,
                         font: {
-                            size: 9
+                            size: 12
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return createSimpleWrappedText(label, 18); // Simple wrapped text at 18 characters
+                            return createSimpleWrappedText(label, 25); // Simple wrapped text at 25 characters
                         }
                     },
                     grid: {
@@ -604,7 +604,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 50,
+                    bottom: 80,
                     left: 10,
                     right: 10
                 }
@@ -652,11 +652,11 @@ function initializeCharts() {
                         maxRotation: 0,
                         minRotation: 0,
                         font: {
-                            size: 9
+                            size: 12
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return createSimpleWrappedText(label, 18); // Simple wrapped text at 18 characters
+                            return createSimpleWrappedText(label, 25); // Simple wrapped text at 25 characters
                         }
                     },
                     grid: {
@@ -718,7 +718,7 @@ function initializeCharts() {
             },
             layout: {
                 padding: {
-                    bottom: 50,
+                    bottom: 80,
                     left: 10,
                     right: 10
                 }
@@ -1109,11 +1109,11 @@ function updatePollChart(pollId) {
         maxRotation: 0,
         minRotation: 0,
         font: {
-            size: 8
+            size: 12
         },
         callback: function(value, index, ticks) {
             const label = this.getLabelForValue(value);
-            return createSimpleWrappedText(label, 15); // Simple wrapped text at 15 characters
+            return createSimpleWrappedText(label, 25); // Simple wrapped text at 25 characters
         }
     };
     
