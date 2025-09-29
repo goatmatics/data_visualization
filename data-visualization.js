@@ -487,6 +487,11 @@ function initializeCharts() {
                 tooltip: {
                     enabled: false
                 }
+            },
+            elements: {
+                bar: {
+                    borderWidth: 0
+                }
             }
         }
     });
@@ -514,6 +519,11 @@ function initializeCharts() {
                     enabled: false
                 }
             },
+            elements: {
+                bar: {
+                    borderWidth: 0
+                }
+            },
             layout: {
                 padding: {
                     bottom: 80,
@@ -531,13 +541,7 @@ function initializeCharts() {
                     beginAtZero: true,
                     max: 100,
                     title: {
-                        display: true,
-                        text: 'Percentage (%)',
-                        color: '#b0b0b0',
-                        font: {
-                            size: 12,
-                            weight: 'bold'
-                        }
+                        display: false
                     },
                     ticks: {
                         color: '#b0b0b0',
@@ -551,13 +555,7 @@ function initializeCharts() {
                 },
                 x: {
                     title: {
-                        display: true,
-                        text: 'Responses',
-                        color: '#b0b0b0',
-                        font: {
-                            size: 12,
-                            weight: 'bold'
-                        }
+                        display: false
                     },
                     ticks: {
                         color: '#b0b0b0',
@@ -602,6 +600,11 @@ function initializeCharts() {
                     enabled: false
                 }
             },
+            elements: {
+                bar: {
+                    borderWidth: 0
+                }
+            },
             layout: {
                 padding: {
                     bottom: 80,
@@ -619,13 +622,7 @@ function initializeCharts() {
                     beginAtZero: true,
                     max: 100,
                     title: {
-                        display: true,
-                        text: 'Percentage (%)',
-                        color: '#b0b0b0',
-                        font: {
-                            size: 12,
-                            weight: 'bold'
-                        }
+                        display: false
                     },
                     ticks: {
                         color: '#b0b0b0',
@@ -639,13 +636,7 @@ function initializeCharts() {
                 },
                 x: {
                     title: {
-                        display: true,
-                        text: 'Responses',
-                        color: '#b0b0b0',
-                        font: {
-                            size: 12,
-                            weight: 'bold'
-                        }
+                        display: false
                     },
                     ticks: {
                         color: '#b0b0b0',
@@ -689,6 +680,11 @@ function initializeCharts() {
                 tooltip: {
                     enabled: false
                 }
+            },
+            elements: {
+                bar: {
+                    borderWidth: 0
+                }
             }
         }
     });
@@ -714,6 +710,11 @@ function initializeCharts() {
                 },
                 tooltip: {
                     enabled: false
+                }
+            },
+            elements: {
+                bar: {
+                    borderWidth: 0
                 }
             },
             layout: {
@@ -1103,18 +1104,27 @@ function updatePollChart(pollId) {
         }
     };
     
-    // Update x-axis formatting for poll chart with simple wrapped text
+    // Update x-axis formatting for poll chart with centered wrapped text
     charts.pollChart.options.scales.x.ticks = {
         color: '#b0b0b0',
         maxRotation: 0,
         minRotation: 0,
         font: {
-            size: 12
+            size: 11
         },
+        maxTicksLimit: 10,
         callback: function(value, index, ticks) {
             const label = this.getLabelForValue(value);
-            return createSimpleWrappedText(label, 25); // Simple wrapped text at 25 characters
+            return createSimpleWrappedText(label, 30); // Centered wrapped text at 30 characters
         }
+    };
+    
+    // Ensure all ticks are shown
+    charts.pollChart.options.scales.x.afterBuildTicks = function(axis) {
+        // Force all ticks to be shown
+        axis.ticks.forEach(function(tick) {
+            tick.label = createSimpleWrappedText(tick.label, 30);
+        });
     };
     
     // Disable tooltips for cleaner look
@@ -1178,11 +1188,11 @@ function justifyText(text, maxLength) {
     return justifiedLines.join('\n');
 }
 
-// Helper function to create simple wrapped text for x-axis labels
+// Helper function to create centered wrapped text for x-axis labels
 function createSimpleWrappedText(text, maxLength) {
     if (!text) return '';
     
-    // Simple word wrapping without justification
+    // Simple word wrapping with centering
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
@@ -1197,7 +1207,14 @@ function createSimpleWrappedText(text, maxLength) {
     }
     
     if (currentLine) lines.push(currentLine);
-    return lines.join('\n');
+    
+    // Center each line
+    const centeredLines = lines.map(line => {
+        const padding = Math.floor((maxLength - line.length) / 2);
+        return ' '.repeat(padding) + line + ' '.repeat(maxLength - line.length - padding);
+    });
+    
+    return centeredLines.join('\n');
 }
 
 // Map abbreviated responses to full questionnaire options
