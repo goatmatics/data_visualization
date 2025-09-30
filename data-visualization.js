@@ -751,7 +751,7 @@ function createAllPollCharts() {
                             },
                             callback: function(value, index, ticks) {
                                 const label = this.getLabelForValue(value);
-                                return createSimpleWrappedText(label, 30);
+                                return label;
                             }
                         },
                         grid: {
