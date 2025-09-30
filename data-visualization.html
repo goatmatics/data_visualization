@@ -555,19 +555,8 @@
             </div>
 
             <!-- Poll Questions Section -->
-            <div class="charts-section">
-                <div class="chart-container" style="grid-column: 1 / -1;">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Poll Question Analysis</h3>
-                        <select class="filter-select" id="poll-selector" style="width: 300px;">
-                            <option value="">Select a poll question...</option>
-                        </select>
-                    </div>
-                    <div id="poll-question-display"></div>
-                    <div class="poll-chart-wrapper">
-                        <canvas id="pollChart"></canvas>
-                    </div>
-                </div>
+            <div class="charts-section" id="all-poll-charts" style="grid-template-columns: repeat(2, 1fr);">
+                <!-- All poll charts will be dynamically generated here -->
             </div>
         </div>
     </main>

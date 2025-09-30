@@ -237,14 +237,7 @@ function loadPollQuestions() {
         }
     };
     
-    // Populate poll selector
-    const pollSelector = document.getElementById('poll-selector');
-    Object.keys(pollQuestions).forEach(pollId => {
-        const option = document.createElement('option');
-        option.value = pollId;
-        option.textContent = `Poll ${pollId.replace('poll', '')}: ${pollQuestions[pollId].category}`;
-        pollSelector.appendChild(option);
-    });
+    // Poll selector removed - all charts will be displayed simultaneously
     
     // Populate category filter
     const categoryFilter = document.getElementById('category-filter');
@@ -662,81 +655,113 @@ function initializeCharts() {
         }
     });
     
-    // Poll Question Chart
-    charts.pollChart = new Chart(document.getElementById('pollChart'), {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                data: [],
-                backgroundColor: chartColors[0],
-                borderColor: chartColors[0],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: false
-                }
+    // Create individual poll charts for all poll questions
+    createAllPollCharts();
+}
+
+// Create individual poll charts for all poll questions
+function createAllPollCharts() {
+    const container = document.getElementById('all-poll-charts');
+    container.innerHTML = ''; // Clear existing content
+    
+    Object.keys(pollQuestions).forEach((pollId, index) => {
+        const poll = pollQuestions[pollId];
+        
+        // Create chart container
+        const chartContainer = document.createElement('div');
+        chartContainer.className = 'chart-container';
+        chartContainer.innerHTML = `
+            <div class="chart-header">
+                <h3 class="chart-title">${poll.category}</h3>
+            </div>
+            <div class="poll-question">
+                <div class="poll-question-text">${poll.question}</div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="pollChart_${pollId}"></canvas>
+            </div>
+        `;
+        
+        container.appendChild(chartContainer);
+        
+        // Create chart
+        const canvas = document.getElementById(`pollChart_${pollId}`);
+        charts[`pollChart_${pollId}`] = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '',
+                    data: [],
+                    backgroundColor: chartColors[index % chartColors.length],
+                    borderColor: chartColors[index % chartColors.length],
+                    borderWidth: 1
+                }]
             },
-            elements: {
-                bar: {
-                    borderWidth: 0
-                }
-            },
-            layout: {
-                padding: {
-                    bottom: 80,
-                    left: 10,
-                    right: 10
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    title: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: false
                     },
-                    ticks: {
-                        color: '#b0b0b0',
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    },
-                    grid: {
-                        color: '#333333'
+                    tooltip: {
+                        enabled: false
                     }
                 },
-                x: {
-                    title: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#b0b0b0',
-                        maxRotation: 0,
-                        minRotation: 0,
-                        font: {
-                            size: 11
+                elements: {
+                    bar: {
+                        borderWidth: 0
+                    }
+                },
+                layout: {
+                    padding: {
+                        bottom: 80,
+                        left: 10,
+                        right: 10
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: false
                         },
-                        maxTicksLimit: 10,
-                        callback: function(value, index, ticks) {
-                            const label = this.getLabelForValue(value);
-                            return createSimpleWrappedText(label, 30);
+                        ticks: {
+                            color: '#b0b0b0',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        grid: {
+                            color: '#333333'
                         }
                     },
-                    grid: {
-                        color: '#333333'
+                    x: {
+                        title: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#b0b0b0',
+                            maxRotation: 0,
+                            minRotation: 0,
+                            font: {
+                                size: 11
+                            },
+                            maxTicksLimit: 10,
+                            callback: function(value, index, ticks) {
+                                const label = this.getLabelForValue(value);
+                                return createSimpleWrappedText(label, 30);
+                            }
+                        },
+                        grid: {
+                            color: '#333333'
+                        }
                     }
                 }
             }
-        }
+        });
     });
 }
 
@@ -745,11 +770,38 @@ function updateAllCharts() {
     updateGeoChart();
     updateAgeChart();
     updateAffiliationChart();
+    updateAllPollCharts();
 }
 
-// Response distribution chart removed
+// Update all individual poll charts
+function updateAllPollCharts() {
+    Object.keys(pollQuestions).forEach(pollId => {
+        updateIndividualPollChart(pollId);
+    });
+}
 
-// Helper function removed - no longer needed
+// Update individual poll chart
+function updateIndividualPollChart(pollId) {
+    const chartKey = `pollChart_${pollId}`;
+    if (!charts[chartKey]) return;
+    
+    const pollData = filteredData.filter(d => d.pollId === pollId);
+    const responseCounts = {};
+    
+    pollData.forEach(d => {
+        responseCounts[d.response] = (responseCounts[d.response] || 0) + 1;
+    });
+    
+    const total = Object.values(responseCounts).reduce((sum, count) => sum + count, 0);
+    const labels = Object.keys(responseCounts).map(response => mapResponseToFullOption(pollId, response));
+    const data = Object.values(responseCounts).map(count => Math.round((count / total) * 100 * 10) / 10);
+    
+    charts[chartKey].data.labels = labels;
+    charts[chartKey].data.datasets[0].data = data;
+    charts[chartKey].data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
+    
+    charts[chartKey].update();
+}
 
 // Update geographic distribution chart
 function updateGeoChart() {
@@ -967,15 +1019,6 @@ function exportData() {
 
 // Setup event listeners
 function setupEventListeners() {
-    // Poll selector change
-    document.getElementById('poll-selector').addEventListener('change', function() {
-        const pollId = this.value;
-        if (pollId && pollQuestions[pollId]) {
-            displayPollQuestion(pollId);
-            updatePollChart(pollId);
-        }
-    });
-    
     // Filter change events
     const filterElements = document.querySelectorAll('.filter-select');
     filterElements.forEach(element => {
@@ -983,51 +1026,7 @@ function setupEventListeners() {
     });
 }
 
-// Display poll question
-function displayPollQuestion(pollId) {
-    const poll = pollQuestions[pollId];
-    const displayDiv = document.getElementById('poll-question-display');
-    
-    displayDiv.innerHTML = `
-        <div class="poll-question">
-            <div class="poll-category">${poll.category}</div>
-            <div class="poll-question-text">${poll.question}</div>
-        </div>
-    `;
-}
-
-// Update poll chart for specific poll
-function updatePollChart(pollId) {
-    const pollData = filteredData.filter(d => d.pollId === pollId);
-    const responseCounts = {};
-    
-    pollData.forEach(d => {
-        responseCounts[d.response] = (responseCounts[d.response] || 0) + 1;
-    });
-    
-    const total = Object.values(responseCounts).reduce((sum, count) => sum + count, 0);
-    const labels = Object.keys(responseCounts).map(response => mapResponseToFullOption(pollId, response));
-    const data = Object.values(responseCounts).map(count => Math.round((count / total) * 100 * 10) / 10); // Convert to percentage
-    
-    charts.pollChart.data.labels = labels;
-    charts.pollChart.data.datasets[0].data = data;
-    charts.pollChart.data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
-    
-    // Tooltip is already disabled in chart initialization
-    
-    // X-axis formatting is already configured in chart initialization
-    
-    // Disable tooltips for cleaner look
-    charts.pollChart.options.plugins.tooltip = {
-        enabled: false
-    };
-    
-    // Increase chart height for better text display
-    charts.pollChart.options.maintainAspectRatio = false;
-    charts.pollChart.canvas.parentNode.style.height = '500px';
-    
-    charts.pollChart.update();
-}
+// Old poll functions removed - replaced with individual chart system
 
 // Helper function to wrap text for better display
 function wrapText(text, maxLength) {
