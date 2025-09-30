@@ -716,7 +716,7 @@ function createAllPollCharts() {
                 },
                 layout: {
                     padding: {
-                        bottom: 80,
+                        bottom: 120,
                         left: 10,
                         right: 10
                     }
@@ -749,7 +749,6 @@ function createAllPollCharts() {
                             font: {
                                 size: 11
                             },
-                            maxTicksLimit: 10,
                             callback: function(value, index, ticks) {
                                 const label = this.getLabelForValue(value);
                                 return createSimpleWrappedText(label, 30);
@@ -757,6 +756,13 @@ function createAllPollCharts() {
                         },
                         grid: {
                             color: '#333333'
+                        },
+                        afterBuildTicks: function(axis) {
+                            // Force all ticks to be displayed
+                            axis.ticks = axis.ticks.map((tick, index) => ({
+                                ...tick,
+                                label: axis.chart.data.labels[index] || ''
+                            }));
                         }
                     }
                 }
