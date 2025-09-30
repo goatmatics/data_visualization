@@ -744,8 +744,8 @@ function createAllPollCharts() {
                         },
                         ticks: {
                             color: '#b0b0b0',
-                            maxRotation: 0,
-                            minRotation: 0,
+                            maxRotation: 75,
+                            minRotation: 75,
                             font: {
                                 size: 11
                             },
