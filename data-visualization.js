@@ -531,7 +531,7 @@ function initializeCharts() {
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return createSimpleWrappedText(label, 25); // Simple wrapped text at 25 characters
+                            return label;
                         }
                     },
                     grid: {
@@ -613,7 +613,7 @@ function initializeCharts() {
                         },
                         callback: function(value, index, ticks) {
                             const label = this.getLabelForValue(value);
-                            return createSimpleWrappedText(label, 25); // Simple wrapped text at 25 characters
+                            return label;
                         }
                     },
                     grid: {
@@ -751,7 +751,7 @@ function createAllPollCharts() {
                             },
                             callback: function(value, index, ticks) {
                                 const label = this.getLabelForValue(value);
-                                return createSimpleWrappedText(label, 30);
+                                return label;
                             }
                         },
                         grid: {
