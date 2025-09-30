@@ -473,6 +473,7 @@ function initializeCharts() {
         data: {
             labels: [],
             datasets: [{
+                label: '',
                 data: [],
                 backgroundColor: chartColors[1],
                 borderColor: chartColors[1],
@@ -554,6 +555,7 @@ function initializeCharts() {
         data: {
             labels: [],
             datasets: [{
+                label: '',
                 data: [],
                 backgroundColor: chartColors[2],
                 borderColor: chartColors[2],
@@ -767,18 +769,7 @@ function updateGeoChart() {
     charts.geoChart.data.labels = labels;
     charts.geoChart.data.datasets[0].data = data;
     
-    // Update chart options to show percentage
-    charts.geoChart.options.plugins.tooltip = {
-        callbacks: {
-            label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-                const count = Math.round((value / 100) * total);
-                return `${label}: ${value}% (${count} responses)`;
-            }
-        }
-    };
+    // Tooltip disabled to prevent undefined legends
     
     charts.geoChart.update();
 }
@@ -801,18 +792,7 @@ function updateAgeChart() {
     charts.ageChart.data.labels = labels;
     charts.ageChart.data.datasets[0].data = data;
     
-    // Update chart options to show percentage
-    charts.ageChart.options.plugins.tooltip = {
-        callbacks: {
-            label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-                const count = Math.round((value / 100) * total);
-                return `${label}: ${value}% (${count} responses)`;
-            }
-        }
-    };
+    // Tooltip disabled to prevent undefined legends
     
     charts.ageChart.update();
 }
