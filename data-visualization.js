@@ -1036,33 +1036,50 @@ function setupEventListeners() {
 
 // Unused helper functions removed
 
-// Helper function to create centered wrapped text for x-axis labels
+// Helper function to create natural wrapped text for x-axis labels
 function createSimpleWrappedText(text, maxLength) {
     if (!text) return '';
     
-    // Simple word wrapping with centering
+    // If text is short enough, return as is
+    if (text.length <= maxLength) {
+        return text;
+    }
+    
+    // Natural word wrapping without artificial padding
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
     
     for (const word of words) {
-        if ((currentLine + ' ' + word).length <= maxLength) {
-            currentLine += (currentLine ? ' ' : '') + word;
+        // Check if adding this word would exceed the limit
+        const testLine = currentLine ? currentLine + ' ' + word : word;
+        
+        if (testLine.length <= maxLength) {
+            currentLine = testLine;
         } else {
-            if (currentLine) lines.push(currentLine);
-            currentLine = word;
+            // If current line has content, save it and start new line
+            if (currentLine) {
+                lines.push(currentLine);
+                currentLine = word;
+            } else {
+                // If single word is too long, break it
+                if (word.length > maxLength) {
+                    lines.push(word.substring(0, maxLength - 3) + '...');
+                    currentLine = '';
+                } else {
+                    currentLine = word;
+                }
+            }
         }
     }
     
-    if (currentLine) lines.push(currentLine);
+    // Add the last line if it has content
+    if (currentLine) {
+        lines.push(currentLine);
+    }
     
-    // Center each line
-    const centeredLines = lines.map(line => {
-        const padding = Math.floor((maxLength - line.length) / 2);
-        return ' '.repeat(padding) + line + ' '.repeat(maxLength - line.length - padding);
-    });
-    
-    return centeredLines.join('\n');
+    // Return lines joined with newlines, no artificial padding
+    return lines.join('\n');
 }
 
 // Map abbreviated responses to full questionnaire options
