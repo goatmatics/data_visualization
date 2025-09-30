@@ -743,26 +743,10 @@ function createAllPollCharts() {
                             display: false
                         },
                         ticks: {
-                            color: '#b0b0b0',
-                            maxRotation: 0,
-                            minRotation: 0,
-                            font: {
-                                size: 11
-                            },
-                            callback: function(value, index, ticks) {
-                                const label = this.getLabelForValue(value);
-                                return label;
-                            }
+                            display: false
                         },
                         grid: {
                             color: '#333333'
-                        },
-                        afterBuildTicks: function(axis) {
-                            // Force all ticks to be displayed
-                            axis.ticks = axis.ticks.map((tick, index) => ({
-                                ...tick,
-                                label: axis.chart.data.labels[index] || ''
-                            }));
                         }
                     }
                 }
