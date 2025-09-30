@@ -744,14 +744,14 @@ function createAllPollCharts() {
                         },
                         ticks: {
                             color: '#b0b0b0',
-                            maxRotation: 75,
-                            minRotation: 75,
+                            maxRotation: 0,
+                            minRotation: 0,
                             font: {
                                 size: 11
                             },
                             callback: function(value, index, ticks) {
                                 const label = this.getLabelForValue(value);
-                                return label;
+                                return wrapTextForHorizontalDisplay(label, 20);
                             }
                         },
                         grid: {
@@ -1036,8 +1036,8 @@ function setupEventListeners() {
 
 // Unused helper functions removed
 
-// Helper function to create natural wrapped text for x-axis labels
-function createSimpleWrappedText(text, maxLength) {
+// Helper function to wrap text for horizontal display
+function wrapTextForHorizontalDisplay(text, maxLength) {
     if (!text) return '';
     
     // If text is short enough, return as is
@@ -1045,7 +1045,7 @@ function createSimpleWrappedText(text, maxLength) {
         return text;
     }
     
-    // Natural word wrapping without artificial padding
+    // Smart word wrapping for horizontal display
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
@@ -1062,10 +1062,27 @@ function createSimpleWrappedText(text, maxLength) {
                 lines.push(currentLine);
                 currentLine = word;
             } else {
-                // If single word is too long, break it
+                // If single word is too long, break it intelligently
                 if (word.length > maxLength) {
-                    lines.push(word.substring(0, maxLength - 3) + '...');
-                    currentLine = '';
+                    // Try to break at hyphens or other natural break points
+                    if (word.includes('-')) {
+                        const parts = word.split('-');
+                        let tempLine = '';
+                        for (let i = 0; i < parts.length; i++) {
+                            const part = parts[i] + (i < parts.length - 1 ? '-' : '');
+                            if ((tempLine + part).length <= maxLength) {
+                                tempLine += part;
+                            } else {
+                                if (tempLine) lines.push(tempLine);
+                                tempLine = part;
+                            }
+                        }
+                        currentLine = tempLine;
+                    } else {
+                        // Break long word with ellipsis
+                        lines.push(word.substring(0, maxLength - 3) + '...');
+                        currentLine = '';
+                    }
                 } else {
                     currentLine = word;
                 }
@@ -1078,7 +1095,7 @@ function createSimpleWrappedText(text, maxLength) {
         lines.push(currentLine);
     }
     
-    // Return lines joined with newlines, no artificial padding
+    // Return lines joined with newlines for proper display
     return lines.join('\n');
 }
 
