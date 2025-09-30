@@ -221,7 +221,7 @@
         /* Charts Section */
         .charts-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
             margin-bottom: 3rem;
         }
@@ -505,21 +505,6 @@
 
             <!-- Charts Section -->
             <div class="charts-section">
-                <!-- Response Distribution Chart -->
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Response Distribution</h3>
-                        <div class="chart-type-selector">
-                            <button class="chart-type-btn active" onclick="changeChartType('responseChart', 'doughnut')">Doughnut</button>
-                            <button class="chart-type-btn" onclick="changeChartType('responseChart', 'bar')">Bar</button>
-                            <button class="chart-type-btn" onclick="changeChartType('responseChart', 'pie')">Pie</button>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="responseChart"></canvas>
-                    </div>
-                </div>
-
                 <!-- Geographic Distribution Chart -->
                 <div class="chart-container">
                     <div class="chart-header">

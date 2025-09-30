@@ -465,36 +465,7 @@ function getCountryCoordinates(country) {
 
 // Initialize all charts
 function initializeCharts() {
-    // Response Distribution Chart
-    charts.responseChart = new Chart(document.getElementById('responseChart'), {
-        type: 'doughnut',
-        data: {
-            labels: [],
-            datasets: [{
-                data: [],
-                backgroundColor: chartColors,
-                borderColor: '#333333',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: false
-                }
-            },
-            elements: {
-                bar: {
-                    borderWidth: 0
-                }
-            }
-        }
-    });
+    // Response Distribution Chart removed
     
     // Geographic Distribution Chart
     charts.geoChart = new Chart(document.getElementById('geoChart'), {
@@ -769,57 +740,14 @@ function initializeCharts() {
 
 // Update all charts with current data
 function updateAllCharts() {
-    updateResponseChart();
     updateGeoChart();
     updateAgeChart();
     updateAffiliationChart();
 }
 
-// Update response distribution chart
-function updateResponseChart() {
-    const responseCounts = {};
-    filteredData.forEach(d => {
-        responseCounts[d.response] = (responseCounts[d.response] || 0) + 1;
-    });
-    
-    const total = Object.values(responseCounts).reduce((sum, count) => sum + count, 0);
-    const labels = Object.keys(responseCounts).map(response => {
-        // Try to find which poll this response belongs to and map it
-        const pollId = findPollIdForResponse(response);
-        return pollId ? mapResponseToFullOption(pollId, response) : response;
-    });
-    const data = Object.values(responseCounts).map(count => Math.round((count / total) * 100 * 10) / 10); // Convert to percentage with 1 decimal
-    
-    charts.responseChart.data.labels = labels;
-    charts.responseChart.data.datasets[0].data = data;
-    charts.responseChart.data.datasets[0].backgroundColor = chartColors.slice(0, labels.length);
-    
-    // Update chart options to show percentage
-    charts.responseChart.options.plugins.tooltip = {
-        callbacks: {
-            label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-                const count = Math.round((value / 100) * total);
-                return `${label}: ${value}% (${count} responses)`;
-            }
-        }
-    };
-    
-    charts.responseChart.update();
-}
+// Response distribution chart removed
 
-// Helper function to find which poll a response belongs to
-function findPollIdForResponse(response) {
-    for (const pollId of Object.keys(pollQuestions)) {
-        const pollData = filteredData.filter(d => d.pollId === pollId && d.response === response);
-        if (pollData.length > 0) {
-            return pollId;
-        }
-    }
-    return null;
-}
+// Helper function removed - no longer needed
 
 // Update geographic distribution chart
 function updateGeoChart() {
