@@ -1034,54 +1034,7 @@ function setupEventListeners() {
 
 // Old poll functions removed - replaced with individual chart system
 
-// Helper function to wrap text for better display
-function wrapText(text, maxLength) {
-    if (!text || text.length <= maxLength) return text;
-    
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = '';
-    
-    for (const word of words) {
-        if ((currentLine + word).length <= maxLength) {
-            currentLine += (currentLine ? ' ' : '') + word;
-        } else {
-            if (currentLine) lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    
-    if (currentLine) lines.push(currentLine);
-    return lines.join('\n');
-}
-
-// Helper function to justify text with proper spacing
-function justifyText(text, maxLength) {
-    if (!text || text.length <= maxLength) return text;
-    
-    const lines = text.split('\n');
-    const justifiedLines = lines.map(line => {
-        if (line.length <= maxLength) return line;
-        
-        const words = line.split(' ');
-        if (words.length <= 1) return line;
-        
-        const totalSpaces = maxLength - line.replace(/\s/g, '').length;
-        const gaps = words.length - 1;
-        const baseSpaces = Math.floor(totalSpaces / gaps);
-        const extraSpaces = totalSpaces % gaps;
-        
-        let justifiedLine = words[0];
-        for (let i = 1; i < words.length; i++) {
-            const spaces = baseSpaces + (i <= extraSpaces ? 1 : 0);
-            justifiedLine += ' '.repeat(spaces) + words[i];
-        }
-        
-        return justifiedLine;
-    });
-    
-    return justifiedLines.join('\n');
-}
+// Unused helper functions removed
 
 // Helper function to create centered wrapped text for x-axis labels
 function createSimpleWrappedText(text, maxLength) {
